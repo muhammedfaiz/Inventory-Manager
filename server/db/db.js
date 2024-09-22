@@ -5,6 +5,10 @@ const db = ()=>{
     mongoose.connection.on("connected", () => {
         console.log("MongoDB connected");
     });
+    mongoose.connection.on("error", (err) => {
+        console.error(`Error connecting to MongoDB: ${err.message}`);
+        process.exit(1);
+    });
 }
 
 module.exports = db;

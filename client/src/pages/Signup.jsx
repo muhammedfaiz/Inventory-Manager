@@ -4,10 +4,9 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { signupService } from "@/services/userService";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
-  // State to track form inputs and errors
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,6 +15,7 @@ const Signup = () => {
   
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  
   // Validation rules for form inputs
   const validate = () => {
     const newErrors = {};
@@ -41,7 +41,7 @@ const Signup = () => {
     return newErrors;
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const validationErrors = validate();
@@ -49,7 +49,7 @@ const Signup = () => {
       setErrors(validationErrors);
     } else {
       const result = await signupService(formData);
-      if(result.status == 200){
+      if (result.status === 200) {
         toast.success(result.data);
         navigate("/");
       }
@@ -147,6 +147,14 @@ const Signup = () => {
         >
           Signup
         </Button>
+
+        {/* Login Link */}
+        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+          Already have an account?{" "}
+          <Link to="/login" className="text-indigo-600 hover:underline">
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );

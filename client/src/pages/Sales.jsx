@@ -11,7 +11,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "react-toastify";
-import { fetchCustomer, fetchProducts, fetchSales, recordSale } from "@/services/userService";
+import {
+  fetchCustomer,
+  fetchProducts,
+  fetchSales,
+  recordSale,
+  removeSale,
+} from "@/services/userService";
 
 const Sales = () => {
   const [products, setProducts] = useState([]);
@@ -24,6 +30,9 @@ const Sales = () => {
   const [sales, setSales] = useState([]);
   const [change, setChange] = useState(false);
 
+  // Validation error states
+  const [errors, setErrors] = useState({});
+  
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const salesPerPage = 5;
@@ -47,6 +56,41 @@ const Sales = () => {
   }, [change]);
 
   const handleRecordSale = async () => {
+    const errors = {};
+
+    if (!date) {
+      errors.date = "Date is required.";
+    } else {
+      const today = new Date().setHours(0, 0, 0, 0);
+      const selectedDate = new Date(date).setHours(0, 0, 0, 0);
+
+      if (selectedDate > today) {
+        errors.date = "Date cannot be in the future.";
+      }
+    }
+
+    if (!quantity) {
+      errors.quantity = "Quantity is required.";
+    }
+
+    if (!customer) {
+      errors.customer = "Customer is required.";
+    }
+
+    if (!cash) {
+      errors.cash = "Cash is required.";
+    }
+
+    if (!product) {
+      errors.product = "Product is required.";
+    }
+
+    setErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     const newSale = {
       date,
       quantity: parseInt(quantity),
@@ -54,11 +98,6 @@ const Sales = () => {
       cash: parseFloat(cash),
       productId: product,
     };
-
-    if (!date || !quantity || !customer || !cash || !product) {
-      toast.error("Please fill in all fields");
-      return;
-    }
 
     try {
       const result = await recordSale(newSale);
@@ -70,13 +109,21 @@ const Sales = () => {
         setCash("");
         setProduct("");
         setChange(!change);
+        setErrors({});
       }
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  // Get the current sales to display based on the current page
+  const handleDelete = async(id)=>{
+    const result = await  removeSale(id);
+    if(result.status == 200){
+      toast.success(result.data.message);
+      setChange(!change);
+    }
+  }
+
   const indexOfLastSale = currentPage * salesPerPage;
   const indexOfFirstSale = indexOfLastSale - salesPerPage;
   const currentSales = sales.slice(indexOfFirstSale, indexOfLastSale);
@@ -112,6 +159,7 @@ const Sales = () => {
               onChange={(e) => setDate(e.target.value)}
               className="mt-2"
             />
+            {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
           </div>
           <div>
             <Label htmlFor="product">Product</Label>
@@ -127,6 +175,9 @@ const Sales = () => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.product && (
+              <p className="text-red-500 text-sm">{errors.product}</p>
+            )}
           </div>
           <div>
             <Label htmlFor="quantity">Quantity</Label>
@@ -137,6 +188,9 @@ const Sales = () => {
               onChange={(e) => setQuantity(e.target.value)}
               className="mt-2"
             />
+            {errors.quantity && (
+              <p className="text-red-500 text-sm">{errors.quantity}</p>
+            )}
           </div>
           <div>
             <Label htmlFor="customerName">Customer Name</Label>
@@ -152,6 +206,9 @@ const Sales = () => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.customer && (
+              <p className="text-red-500 text-sm">{errors.customer}</p>
+            )}
           </div>
           <div>
             <Label htmlFor="cash">Cash</Label>
@@ -163,6 +220,7 @@ const Sales = () => {
               onChange={(e) => setCash(e.target.value)}
               className="mt-2"
             />
+            {errors.cash && <p className="text-red-500 text-sm">{errors.cash}</p>}
           </div>
         </div>
         <Button className="mt-4" onClick={handleRecordSale}>
@@ -171,30 +229,43 @@ const Sales = () => {
 
         {/* Sales List */}
         <h3 className="text-xl font-bold mt-8 mb-4">Sales List</h3>
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b font-medium">
-            <tr>
-              <th scope="col" className="px-6 py-4">SI.NO</th>
-              <th scope="col" className="px-6 py-4">Date</th>
-              <th scope="col" className="px-6 py-4">Product</th>
-              <th scope="col" className="px-6 py-4">Quantity</th>
-              <th scope="col" className="px-6 py-4">Customer Name</th>
-              <th scope="col" className="px-6 py-4">Cash</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentSales.map((sale, index) => (
-              <tr key={index} className="border-b">
-                <td className="px-6 py-4">{indexOfFirstSale + index + 1}</td>
-                <td className="px-6 py-4">{new Date(sale.date).toLocaleDateString('en-GB')}</td>
-                <td className="px-6 py-4">{sale.product.name}</td>
-                <td className="px-6 py-4">{sale.quantity}</td>
-                <td className="px-6 py-4">{sale.customer.name}</td>
-                <td className="px-6 py-4">${sale.cash.toFixed(2)}</td>
+        {sales.length === 0 ? (
+          <p>No sales recorded yet.</p>
+        ) : (
+          <table className="min-w-full text-left text-sm">
+            <thead className="border-b font-medium">
+              <tr>
+                <th scope="col" className="px-6 py-4">SI.NO</th>
+                <th scope="col" className="px-6 py-4">Date</th>
+                <th scope="col" className="px-6 py-4">Product</th>
+                <th scope="col" className="px-6 py-4">Quantity</th>
+                <th scope="col" className="px-6 py-4">Customer Name</th>
+                <th scope="col" className="px-6 py-4">Cash</th>
+                <th scope="col" className="px-6 py-4">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentSales.map((sale, index) => (
+                <tr key={index} className="border-b">
+                  <td className="px-6 py-4">{indexOfFirstSale + index + 1}</td>
+                  <td className="px-6 py-4">{new Date(sale.date).toLocaleDateString('en-GB')}</td>
+                  <td className="px-6 py-4">{sale.product?.name}</td>
+                  <td className="px-6 py-4">{sale.quantity}</td>
+                  <td className="px-6 py-4">{sale.customer?.name}</td>
+                  <td className="px-6 py-4">${sale.cash.toFixed(2)}</td>
+                  <td className="px-6 py-4">
+                      <Button 
+                        variant="destructive" 
+                        onClick={() => handleDelete(sale._id)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
 
         {/* Pagination Controls */}
         <div className="flex justify-between mt-4">

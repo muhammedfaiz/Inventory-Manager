@@ -1,24 +1,25 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { toast } from "react-toastify";
 import { loginService } from "@/services/userService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Import Link from react-router-dom
+import { authContext } from "@/context/AuthContext";
 
 const Login = () => {
-  // State to track form inputs and errors
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const { setToken } = useContext(authContext);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  // Validation rules for form inputs
+
   const validate = () => {
     const newErrors = {};
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(formData.email)) {
@@ -41,8 +42,9 @@ const Login = () => {
     } else {
       try {
         const result = await loginService(formData);
-        if (result.status == 200) {
+        if (result.status === 200) {
           toast.success("Login successful!");
+          setToken(result.data.token);
           navigate("/");
         }
       } catch (error) {
@@ -120,6 +122,14 @@ const Login = () => {
         >
           Login
         </Button>
+
+        {/* Link to Signup */}
+        <p className="mt-4 text-center text-gray-600 dark:text-gray-400">
+        Don&apos;t have an account?{" "}
+          <Link to="/signup" className="text-indigo-600 hover:underline">
+            Sign Up
+          </Link>
+        </p>
       </form>
     </div>
   );

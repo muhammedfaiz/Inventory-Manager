@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,14 +8,21 @@ import {
   FaChartLine,
   FaFileAlt,
   FaSignOutAlt,
-} from "react-icons/fa"; // Icons
+} from "react-icons/fa"; 
+import { authContext } from "@/context/AuthContext";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true); // State to toggle sidebar
+  const [isOpen, setIsOpen] = useState(true); 
+  const {setToken}=useContext(authContext);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+  }
 
   return (
     <div
@@ -69,7 +76,7 @@ const Sidebar = () => {
         <Button
           variant="ghost"
           className="flex items-center text-white p-3 hover:bg-gray-900 rounded-md transition-colors"
-          onClick={() => alert("Logged out!")}
+          onClick={() => logout()}
         >
           <FaSignOutAlt className="mr-2" />
           {isOpen && <span>Logout</span>}

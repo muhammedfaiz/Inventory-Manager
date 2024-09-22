@@ -65,9 +65,9 @@ export const addProduct = async(data)=>{
     }
 }
 
-export const fetchProducts = async()=>{
+export const fetchProducts = async(search)=>{
     try {
-        const response = await axiosInstance.get("/products");
+        const response = await axiosInstance.get(`/products?search=${encodeURI(search)}`);
         return response.data;
     } catch (error) {
         throw new Error(error.response.data.message);
@@ -110,6 +110,15 @@ export const addCustomer = async(data)=>{
     }
 }
 
+export const removeCustomer = async (id)=>{
+  try {
+    const response = await axiosInstance.delete(`/customer/${id}`);
+    return response;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+}
+
 export const recordSale = async(data)=>{
     try {
         const response = await axiosInstance.post("/sale", data);
@@ -126,4 +135,31 @@ export const fetchSales = async()=>{
     } catch (error) {
         throw new Error(error.response.data.message);
     }
+}
+
+export const removeSale = async(id)=>{
+  try {
+    const response = await axiosInstance.delete(`/sales/${id}`);
+    return response;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+}
+
+export const sendEmailService = async(data)=>{
+  try {
+    const response = await axiosInstance.post("/send-email", data);
+    return response;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+}
+
+export const fetchCustomerLedger =async()=>{
+  try {
+    const response = await axiosInstance.get("/customer-ledger");
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
 }

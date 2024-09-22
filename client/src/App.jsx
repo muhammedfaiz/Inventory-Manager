@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import Inventory from "./pages/Inventory";
 import Customer from "./pages/Customer";
 import Sales from "./pages/Sales";
+import Report from "./pages/Report";
+import Auth from "./pages/Auth";
 
 function App() {
   return (
@@ -15,9 +17,12 @@ function App() {
         <Routes>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login/>}/>
+          <Route element={<Auth/>}>
           <Route path="/" element={<Inventory/>}/>
           <Route path="/customers" element={<Customer/>}/>
           <Route path="/sales" element={<Sales/>}/>
+          <Route path="/reports" element={<Report/>}/>
+          </Route>
         </Routes>
       </Router>
       <ToastContainer/>
