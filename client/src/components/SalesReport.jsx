@@ -30,6 +30,7 @@ const SalesReport = () => {
   };
 
   const exportToExcel = () => {
+    console.log("hi")
     const worksheet = XLSX.utils.json_to_sheet(
       salesData.map((sale, index) => ({
         SI_NO: index + 1,
@@ -100,7 +101,7 @@ const SalesReport = () => {
         <Button onClick={handlePrint} className="bg-blue-500 text-white px-4 py-2 rounded">
           Print
         </Button>
-        <Button onClick={exportToExcel} className="bg-green-500 text-white px-4 py-2 rounded">
+        <Button onClick={()=>exportToExcel} className="bg-green-500 text-white px-4 py-2 rounded">
           Export to Excel
         </Button>
         <Button onClick={exportToPDF} className="bg-red-500 text-white px-4 py-2 rounded">

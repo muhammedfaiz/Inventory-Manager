@@ -163,3 +163,12 @@ export const fetchCustomerLedger =async()=>{
     throw new Error(error.response.data.message);
   }
 }
+
+export const fetchItemsReport = async ()=>{
+  try {
+    const response = await axiosInstance.get("/items-report");
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+}

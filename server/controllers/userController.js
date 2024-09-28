@@ -231,6 +231,18 @@ const getCustomerLedger = async (req, res) => {
   }
 };
 
+const getItemReport = async (req, res) => {
+  try {
+    const products = await Product.find();
+    if (!products) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ products:products });
+  } catch (error) {
+    res.status(404).json({ message: "Error while getting item report" });
+  }
+}
+
 module.exports = {
   signup,
   login,
@@ -246,4 +258,5 @@ module.exports = {
   getCustomerLedger,
   deleteCostumer,
   deleteSales,
+  getItemReport
 };

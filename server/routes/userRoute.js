@@ -17,6 +17,7 @@ router.get("/sales",authMiddleware,userController.getSales);
 router.delete("/sales/:id",authMiddleware,userController.deleteSales);
 router.post("/send-email",authMiddleware,userController.sendEmail);
 router.get("/customer-ledger",authMiddleware,userController.getCustomerLedger);
+router.get('/items-report',authMiddleware,userController.getItemReport);
 
 
 module.exports = router;

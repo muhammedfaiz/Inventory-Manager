@@ -1,4 +1,4 @@
-import { fetchProducts, sendEmailService } from "@/services/userService";
+import { fetchItemsReport, sendEmailService } from "@/services/userService";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -23,7 +23,7 @@ const ItemReport = () => {
 
   useEffect(() => {
     const getItems = async () => {
-      const result = await fetchProducts();
+      const result = await fetchItemsReport();
       setItemsData(result.products);
     };
     getItems();
